@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Estrutura da sala
+typedef struct Sala {
+    char nome[50];
+    struct Sala *esquerda;
+    struct Sala *direita;
+} Sala;
+
+// Cria uma nova sala
+Sala* criarSala(char nome[]) {
+    Sala *novaSala = (Sala*) malloc(sizeof(Sala));
+
+    strcpy(novaSala->nome, nome);
+    novaSala->esquerda = NULL;
+    novaSala->direita = NULL;
+
+    return novaSala;
+}
+
+// Exploração da mansão
+void explorarSalas(Sala *atual) {
+
+    char opcao;
+
+    while(atual != NULL) {
+
+        printf("\n=================================");
+        printf("\nVoce esta em: %s", atual->nome);
+        printf("\n=================================\n");
+
+        // Verifica se chegou ao fim do caminho
+        if(atual->esquerda == NULL && atual->direita == NULL) {
+            printf("Fim do caminho! Esta sala nao possui saidas.\n");
+            break;
+        }
+
+        printf("\nEscolha uma opcao:\n");
+
+        if(atual->esquerda != NULL)
+            printf("e - Ir para a esquerda\n");
+
+        if(atual->direita != NULL)
+            printf("d - Ir para a direita\n");
+
+        printf("s - Sair\n");
+
+        printf("\nOpcao: ");
+        scanf(" %c", &opcao);
+
+        if(opcao == 'e' && atual->esquerda != NULL) {
+            atual = atual->esquerda;
+        }
+        else if(opcao == 'd' && atual->direita != NULL) {
+            atual = atual->direita;
+        }
+        else if(opcao == 's') {
+            printf("\nExploracao encerrada.\n");
+            return;
+        }
+        else {
+            printf("\nOpcao invalida!\n");
+        }
+    }
+}
+
+int main() {
+
+    // Criação da árvore da mansão
+
+    Sala *hall = criarSala("Hall de Entrada");
+
+    Sala *biblioteca = criarSala("Biblioteca");
+    Sala *cozinha = criarSala("Cozinha");
+
+    Sala *sotao = criarSala("Sotao");
+    Sala *salaSecreta = criarSala("Sala Secreta");
+    Sala *jardim = criarSala("Jardim");
+    Sala *adega = criarSala("Adega");
+
+    // Conexões da árvore
+    hall->esquerda = biblioteca;
+    hall->direita = cozinha;
+
+    biblioteca->esquerda = sotao;
+    biblioteca->direita = salaSecreta;
+
+    cozinha->esquerda = jardim;
+    cozinha->direita = adega;
+
+    printf("=================================\n");
+    printf("   DETECTIVE QUEST - NOVATO\n");
+    printf("=================================\n");
+
+    explorarSalas(hall);
+
+    // Liberação de memória
+    free(sotao);
+    free(salaSecreta);
+    free(jardim);
+    free(adega);
+    free(biblioteca);
+    free(cozinha);
+    free(hall);
+
+    return 0;
+}
