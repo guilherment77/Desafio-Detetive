@@ -1,0 +1,247 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// ======================
+// ESTRUTURA DAS SALAS
+// ======================
+
+typedef struct Sala {
+    char nome[50];
+    struct Sala *esquerda;
+    struct Sala *direita;
+} Sala;
+
+// ======================
+// ESTRUTURA DAS PISTAS (BST)
+// ======================
+
+typedef struct Pista {
+    char texto[100];
+    struct Pista *esq;
+    struct Pista *dir;
+} Pista;
+
+// ======================
+// FUNÇÕES DAS SALAS
+// ======================
+
+Sala* criarSala(char nome[]) {
+    Sala *nova = (Sala*) malloc(sizeof(Sala));
+
+    strcpy(nova->nome, nome);
+
+    nova->esquerda = NULL;
+    nova->direita = NULL;
+
+    return nova;
+}
+
+// ======================
+// FUNÇÕES DA BST
+// ======================
+
+Pista* criarPista(char texto[]) {
+
+    Pista *nova = (Pista*) malloc(sizeof(Pista));
+
+    strcpy(nova->texto, texto);
+
+    nova->esq = NULL;
+    nova->dir = NULL;
+
+    return nova;
+}
+
+Pista* inserirPista(Pista *raiz, char texto[]) {
+
+    if(raiz == NULL)
+        return criarPista(texto);
+
+    int cmp = strcmp(texto, raiz->texto);
+
+    if(cmp < 0)
+        raiz->esq = inserirPista(raiz->esq, texto);
+
+    else if(cmp > 0)
+        raiz->dir = inserirPista(raiz->dir, texto);
+
+    return raiz;
+}
+
+void listarPistas(Pista *raiz) {
+
+    if(raiz != NULL) {
+
+        listarPistas(raiz->esq);
+
+        printf("- %s\n", raiz->texto);
+
+        listarPistas(raiz->dir);
+    }
+}
+
+int buscarPista(Pista *raiz, char texto[]) {
+
+    if(raiz == NULL)
+        return 0;
+
+    int cmp = strcmp(texto, raiz->texto);
+
+    if(cmp == 0)
+        return 1;
+
+    if(cmp < 0)
+        return buscarPista(raiz->esq, texto);
+
+    return buscarPista(raiz->dir, texto);
+}
+
+// ======================
+// EXPLORAÇÃO
+// ======================
+
+void verificarPista(Sala *sala, Pista **arvorePistas) {
+
+    if(strcmp(sala->nome, "Biblioteca") == 0) {
+
+        if(!buscarPista(*arvorePistas, "Livro Rasgado")) {
+
+            printf("\n>>> Pista encontrada: Livro Rasgado\n");
+
+            *arvorePistas =
+                inserirPista(*arvorePistas,
+                             "Livro Rasgado");
+        }
+    }
+
+    else if(strcmp(sala->nome, "Cozinha") == 0) {
+
+        if(!buscarPista(*arvorePistas, "Faca Misteriosa")) {
+
+            printf("\n>>> Pista encontrada: Faca Misteriosa\n");
+
+            *arvorePistas =
+                inserirPista(*arvorePistas,
+                             "Faca Misteriosa");
+        }
+    }
+
+    else if(strcmp(sala->nome, "Sotao") == 0) {
+
+        if(!buscarPista(*arvorePistas, "Pegadas Antigas")) {
+
+            printf("\n>>> Pista encontrada: Pegadas Antigas\n");
+
+            *arvorePistas =
+                inserirPista(*arvorePistas,
+                             "Pegadas Antigas");
+        }
+    }
+
+    else if(strcmp(sala->nome, "Adega") == 0) {
+
+        if(!buscarPista(*arvorePistas, "Garrafa Quebrada")) {
+
+            printf("\n>>> Pista encontrada: Garrafa Quebrada\n");
+
+            *arvorePistas =
+                inserirPista(*arvorePistas,
+                             "Garrafa Quebrada");
+        }
+    }
+}
+
+void explorarSalas(Sala *atual, Pista **arvorePistas) {
+
+    char opcao;
+
+    while(atual != NULL) {
+
+        printf("\n=================================");
+        printf("\nVoce esta em: %s", atual->nome);
+        printf("\n=================================\n");
+
+        verificarPista(atual, arvorePistas);
+
+        if(atual->esquerda == NULL &&
+           atual->direita == NULL) {
+
+            printf("\nFim do caminho.\n");
+        }
+
+        printf("\nOpcoes:\n");
+
+        if(atual->esquerda)
+            printf("e - Esquerda\n");
+
+        if(atual->direita)
+            printf("d - Direita\n");
+
+        printf("p - Ver pistas\n");
+        printf("s - Sair\n");
+
+        printf("\nEscolha: ");
+        scanf(" %c", &opcao);
+
+        if(opcao == 'e' && atual->esquerda)
+            atual = atual->esquerda;
+
+        else if(opcao == 'd' && atual->direita)
+            atual = atual->direita;
+
+        else if(opcao == 'p') {
+
+            printf("\n===== PISTAS COLETADAS =====\n");
+
+            if(*arvorePistas == NULL)
+                printf("Nenhuma pista encontrada.\n");
+            else
+                listarPistas(*arvorePistas);
+        }
+
+        else if(opcao == 's') {
+
+            printf("\nInvestigacao encerrada.\n");
+            return;
+        }
+    }
+}
+
+// ======================
+// MAIN
+// ======================
+
+int main() {
+
+    Pista *arvorePistas = NULL;
+
+    // Árvore da mansão
+
+    Sala *hall = criarSala("Hall de Entrada");
+
+    Sala *biblioteca = criarSala("Biblioteca");
+    Sala *cozinha = criarSala("Cozinha");
+
+    Sala *sotao = criarSala("Sotao");
+    Sala *salaSecreta = criarSala("Sala Secreta");
+    Sala *jardim = criarSala("Jardim");
+    Sala *adega = criarSala("Adega");
+
+    hall->esquerda = biblioteca;
+    hall->direita = cozinha;
+
+    biblioteca->esquerda = sotao;
+    biblioteca->direita = salaSecreta;
+
+    cozinha->esquerda = jardim;
+    cozinha->direita = adega;
+
+    printf("====================================\n");
+    printf(" DETECTIVE QUEST - NIVEL AVENTUREIRO\n");
+    printf("====================================\n");
+
+    explorarSalas(hall, &arvorePistas);
+
+    return 0;
+}
